@@ -13,7 +13,7 @@ export const Button: React.FC<Props> = ({ title, onPress, loading, style }) => {
   const { colors } = useTheme();
   return (
     <TouchableOpacity onPress={onPress} style={[styles.btn, { backgroundColor: colors.primary }, style]} disabled={loading}>
-      {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.text}>{title}</Text>}
+      {loading ? <ActivityIndicator color="#fff" size={20} /> : <Text style={styles.text}>{title}</Text>}
     </TouchableOpacity>
   );
 };

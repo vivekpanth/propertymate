@@ -2,7 +2,7 @@ import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { Text, View } from 'react-native';
+import { Text, View, ActivityIndicator } from 'react-native';
 import { ThemeProvider } from './src/theme/ThemeProvider';
 
 const Tab = createBottomTabNavigator();
@@ -20,15 +20,15 @@ export default function App() {
     <ThemeProvider>
       <NavigationContainer theme={DefaultTheme}>
         <StatusBar style="auto" />
-        <Tab.Navigator>
-          <Tab.Screen name="Feed" component={() => <Screen title="Feed" />} />
-          <Tab.Screen name="Areas" component={() => <Screen title="Areas" />} />
-          <Tab.Screen name="Search" component={() => <Screen title="Search" />} />
-          <Tab.Screen name="Saved" component={() => <Screen title="Saved" />} />
-          <Tab.Screen name="Messaging" component={() => <Screen title="Messaging" />} />
-          <Tab.Screen name="Profile" component={() => <Screen title="Profile" />} />
-          <Tab.Screen name="Manage" component={() => <Screen title="Manage" />} />
-          <Tab.Screen name="Review" component={() => <Screen title="Review" />} />
+        <Tab.Navigator screenOptions={{ lazy: false }}>
+          <Tab.Screen name="Feed">{() => <Screen title="Feed" />}</Tab.Screen>
+          <Tab.Screen name="Areas">{() => <Screen title="Areas" />}</Tab.Screen>
+          <Tab.Screen name="Search">{() => <Screen title="Search" />}</Tab.Screen>
+          <Tab.Screen name="Saved">{() => <Screen title="Saved" />}</Tab.Screen>
+          <Tab.Screen name="Messaging">{() => <Screen title="Messaging" />}</Tab.Screen>
+          <Tab.Screen name="Profile">{() => <Screen title="Profile" />}</Tab.Screen>
+          <Tab.Screen name="Manage">{() => <Screen title="Manage" />}</Tab.Screen>
+          <Tab.Screen name="Review">{() => <Screen title="Review" />}</Tab.Screen>
         </Tab.Navigator>
       </NavigationContainer>
     </ThemeProvider>
