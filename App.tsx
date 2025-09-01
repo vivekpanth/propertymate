@@ -2,8 +2,9 @@ import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { Text, View, ActivityIndicator } from 'react-native';
+import { Text, View } from 'react-native';
 import { ThemeProvider } from './src/theme/ThemeProvider';
+import { SearchScreen } from './src/features/search/SearchScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -23,7 +24,7 @@ export default function App() {
         <Tab.Navigator screenOptions={{ lazy: false }}>
           <Tab.Screen name="Feed">{() => <Screen title="Feed" />}</Tab.Screen>
           <Tab.Screen name="Areas">{() => <Screen title="Areas" />}</Tab.Screen>
-          <Tab.Screen name="Search">{() => <Screen title="Search" />}</Tab.Screen>
+          <Tab.Screen name="Search">{() => <SearchScreen />}</Tab.Screen>
           <Tab.Screen name="Saved">{() => <Screen title="Saved" />}</Tab.Screen>
           <Tab.Screen name="Messaging">{() => <Screen title="Messaging" />}</Tab.Screen>
           <Tab.Screen name="Profile">{() => <Screen title="Profile" />}</Tab.Screen>

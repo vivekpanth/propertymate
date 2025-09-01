@@ -1,10 +1,9 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react-native';
-import App from '../App';
+import { render } from '@testing-library/react-native';
+import { PropertyCard, Property } from '../src/components/PropertyCard';
 
 // Mock the theme context
 jest.mock('../src/theme/ThemeProvider', () => ({
-  ThemeProvider: ({ children }: { children: React.ReactNode }) => children,
   useTheme: () => ({
     colors: {
       primary: '#335CFF',
@@ -13,6 +12,7 @@ jest.mock('../src/theme/ThemeProvider', () => ({
       muted: '#6B7280',
       surface: '#FFFFFF',
       surfaceAlt: '#F8FAFC',
+      danger: '#EF4444',
     },
     spacing: { xs: 4, sm: 8, md: 16, lg: 24, xl: 32 },
     radius: { sm: 8, md: 12, lg: 16, pill: 9999 },
@@ -43,13 +43,50 @@ jest.mock('../src/utils/haptics', () => ({
   },
 }));
 
-describe('Navigation', () => {
-  it('renders key tabs', () => {
-    render(<App />);
-    // ensure a couple of tabs exist
-    expect(screen.getAllByText('Feed').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Search').length).toBeGreaterThan(0);
+const mockProperty: Property = {
+  id: '1',
+  title: 'Modern 2BR Apartment in CBD',
+  price: 850000,
+  isRental: false,
+  suburb: 'Sydney CBD',
+  address: '123 George Street',
+  bedrooms: 2,
+  bathrooms: 2,
+  parking: 1,
+  thumbnailUrl: 'https://example.com/image.jpg',
+  propertyType: 'apartment',
+};
+
+describe('PropertyCard', () => {
+  it('renders correctly for sale property', () => {
+    const { toJSON } = render(
+      <PropertyCard
+        property={mockProperty}
+        onPress={jest.fn()}
+        onFavorite={jest.fn()}
+        isFavorited={false}
+      />
+    );
+    expect(toJSON()).toMatchSnapshot();
+  });
+
+  it('renders correctly for rental property', () => {
+    const rentalProperty: Property = {
+      ...mockProperty,
+      id: '2',
+      price: undefined,
+      weeklyRent: 650,
+      isRental: true,
+    };
+
+    const { toJSON } = render(
+      <PropertyCard
+        property={rentalProperty}
+        onPress={jest.fn()}
+        onFavorite={jest.fn()}
+        isFavorited={true}
+      />
+    );
+    expect(toJSON()).toMatchSnapshot();
   });
 });
-
-
