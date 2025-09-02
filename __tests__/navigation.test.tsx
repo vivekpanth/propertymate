@@ -2,6 +2,18 @@ import React from 'react';
 import { render, screen } from '@testing-library/react-native';
 import App from '../App';
 
+jest.mock('../src/services/supabase', () => ({
+  supabase: {
+    auth: {
+      signInWithOtp: jest.fn(),
+      onAuthStateChange: jest.fn(() => ({
+        data: { subscription: { unsubscribe: jest.fn() } },
+      })),
+      getSession: jest.fn(async () => ({ data: { session: null }, error: null })),
+    },
+  },
+}));
+
 // Mock the theme context
 jest.mock('../src/theme/ThemeProvider', () => ({
   ThemeProvider: ({ children }: { children: React.ReactNode }) => children,

@@ -5,6 +5,7 @@ import React from 'react';
 import { Text, View } from 'react-native';
 import { ThemeProvider } from './src/theme/ThemeProvider';
 import { SearchScreen } from './src/features/search/SearchScreen';
+import { SignInScreen } from './src/features/auth/SignInScreen';
 
 const Tab = createBottomTabNavigator();
 import { supabase } from './src/services/supabase';
@@ -13,7 +14,6 @@ import { supabase } from './src/services/supabase';
 
 
 
-console.log('Has URL?', !!process.env.EXPO_PUBLIC_SUPABASE_URL);
 function Screen({ title }: { title: string }) {
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -36,6 +36,7 @@ export default function App() {
           <Tab.Screen name="Profile">{() => <Screen title="Profile" />}</Tab.Screen>
           <Tab.Screen name="Manage">{() => <Screen title="Manage" />}</Tab.Screen>
           <Tab.Screen name="Review">{() => <Screen title="Review" />}</Tab.Screen>
+          <Tab.Screen name="SignIn">{() => <SignInScreen />}</Tab.Screen>
         </Tab.Navigator>
       </NavigationContainer>
     </ThemeProvider>
