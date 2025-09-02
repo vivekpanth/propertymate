@@ -6,8 +6,10 @@ import { Text, View } from 'react-native';
 import { ThemeProvider } from './src/theme/ThemeProvider';
 import { SearchScreen } from './src/features/search/SearchScreen';
 import { FeedScreen } from './src/features/feed/FeedScreen';
+import { SignInScreen } from './src/features/auth/SignInScreen';
 
 const Tab = createBottomTabNavigator();
+
 
 function Screen({ title }: { title: string }) {
   return (
@@ -32,6 +34,7 @@ export default function App() {
           <Tab.Screen name="Manage">{() => <Screen title="Manage" />}</Tab.Screen>
           <Tab.Screen name="Review">{() => <Screen title="Review" />}</Tab.Screen>
           <Tab.Screen name="SignIn">{() => <Screen title="SignIn" />}</Tab.Screen>
+          <Tab.Screen name="SignIn">{() => <SignInScreen />}</Tab.Screen>
         </Tab.Navigator>
       </NavigationContainer>
     </ThemeProvider>
