@@ -7,7 +7,13 @@ import { ThemeProvider } from './src/theme/ThemeProvider';
 import { SearchScreen } from './src/features/search/SearchScreen';
 
 const Tab = createBottomTabNavigator();
+import { supabase } from './src/services/supabase';
 
+
+
+
+
+console.log('Has URL?', !!process.env.EXPO_PUBLIC_SUPABASE_URL);
 function Screen({ title }: { title: string }) {
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
