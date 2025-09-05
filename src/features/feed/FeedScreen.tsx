@@ -1,17 +1,22 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { View, Dimensions, FlatList, TouchableOpacity, Text, StyleSheet, ViewToken, ListRenderItemInfo } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { VideoPlayer } from '../../components/video/VideoPlayer';
 import { Heart, Share2, MessageCircle, Volume2, VolumeX } from 'lucide-react-native';
 
-const { height } = Dimensions.get('window');
+const { height: screenHeight, width } = Dimensions.get('window');
 
 const MOCK_VIDEOS = [
-  'https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4',
-  'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
+  'https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
   'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+  'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
+  'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
+  'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
 ];
 
 export const FeedScreen: React.FC = () => {
+  const insets = useSafeAreaInsets();
+  const videoHeight = screenHeight - insets.bottom - 140; // Account for tab bar (~60px)
   const [index, setIndex] = useState(0);
   const [muted, setMuted] = useState(true);
   const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 80 }).current;
@@ -28,7 +33,7 @@ export const FeedScreen: React.FC = () => {
   const renderItem = useCallback(({ item, index: i }: ListRenderItemInfo<string>) => {
     const autoPlay = i === index;
     return (
-      <View style={{ height }}>
+      <View style={{ height: videoHeight, width }}>
         <VideoPlayer uri={item} muted={muted} autoPlay={autoPlay} />
         <View style={styles.overlay} pointerEvents="box-none">
           <View style={styles.actions}>
@@ -51,9 +56,9 @@ export const FeedScreen: React.FC = () => {
         </View>
       </View>
     );
-  }, [index, muted]);
+  }, [index, muted, videoHeight]);
 
-  const getItemLayout = useCallback((_: unknown, i: number) => ({ length: height, offset: height * i, index: i }), []);
+  const getItemLayout = useCallback((_: unknown, i: number) => ({ length: videoHeight, offset: videoHeight * i, index: i }), [videoHeight]);
 
   const data = useMemo(() => MOCK_VIDEOS, []);
 
@@ -68,6 +73,9 @@ export const FeedScreen: React.FC = () => {
       onViewableItemsChanged={onViewableItemsChanged}
       viewabilityConfig={viewabilityConfig}
       getItemLayout={getItemLayout}
+      initialNumToRender={2}
+      windowSize={3}
+      removeClippedSubviews
     />
   );
 };

@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Video, ResizeMode, AVPlaybackStatusSuccess } from 'expo-av';
+import React, { useEffect, useMemo, useRef, useCallback } from 'react';
+import { StyleSheet } from 'react-native';
+import { VideoView, useVideoPlayer } from 'expo-video';
 
 type Props = {
   uri: string;
@@ -10,39 +10,71 @@ type Props = {
   onEnd?: () => void;
 };
 
-export const VideoPlayer: React.FC<Props> = ({ uri, muted=true, autoPlay=true, onReady, onEnd }) => {
-  const ref = useRef<Video | null>(null);
-  const [loadedAt, setLoadedAt] = useState<number | null>(null);
+type Listener = { remove?: () => void };
+
+export const VideoPlayer: React.FC<Props> = ({ uri, muted = true, autoPlay = true, onReady, onEnd }) => {
+  const firstLoadAt = useRef<number | null>(null);
+  const firedReady = useRef(false);
+
+  const source = useMemo(() => ({ uri }), [uri]);
+  const player = useVideoPlayer(source, (p) => {
+    p.loop = true;
+    p.muted = muted;
+    if (autoPlay) p.play();
+  });
+
+  const addListener = useCallback((eventName: string, cb: () => void): Listener => {
+    const p = player as unknown as { addEventListener?: (name: string, cb: () => void) => Listener };
+    return p.addEventListener ? p.addEventListener(eventName, cb) : {};
+  }, [player]);
+
+  const getCurrentTime = useCallback((): number => {
+    const p = player as unknown as { currentTime?: number };
+    return typeof p.currentTime === 'number' ? p.currentTime : 0;
+  }, [player]);
 
   useEffect(() => {
-    return () => {
-      ref.current?.unloadAsync().catch(() => undefined);
-    };
-  }, []);
+    player.muted = muted;
+  }, [muted, player]);
 
-  return (
-    <View style={styles.container}>
-      <Video
-        ref={(r) => (ref.current = r)}
-        style={StyleSheet.absoluteFill}
-        source={{ uri }}
-        resizeMode={ResizeMode.COVER}
-        isMuted={muted}
-        shouldPlay={autoPlay}
-        isLooping
-        onLoadStart={() => setLoadedAt(Date.now())}
-        onReadyForDisplay={() => {
-          if (loadedAt && onReady) onReady(Date.now() - loadedAt);
-        }}
-        onPlaybackStatusUpdate={(status) => {
-          const s = status as AVPlaybackStatusSuccess;
-          if (s.didJustFinish) onEnd?.();
-        }}
-      />
-    </View>
-  );
+  useEffect(() => {
+    if (autoPlay) player.play();
+    else player.pause();
+  }, [autoPlay, player]);
+
+  useEffect(() => {
+    const loadSub = addListener('loadedmetadata', () => {
+      firstLoadAt.current = Date.now();
+      firedReady.current = false;
+    });
+    const endSub = addListener('ended', () => onEnd?.());
+
+    const interval = setInterval(() => {
+      if (!firedReady.current && firstLoadAt.current) {
+        const t = getCurrentTime();
+        if (t > 0) {
+          onReady?.(Date.now() - firstLoadAt.current);
+          firedReady.current = true;
+        }
+      }
+    }, 100);
+
+    return () => {
+      clearInterval(interval);
+      loadSub.remove?.();
+      endSub.remove?.();
+      try {
+        // Guard: on fast unmounts the native object may already be disposed
+        (player as unknown as { pause?: () => void }).pause?.();
+      } catch {
+        // no-op
+      }
+    };
+  }, [onEnd, onReady, player, addListener, getCurrentTime]);
+
+  return <VideoView style={styles.fill} player={player} allowsFullscreen allowsPictureInPicture contentFit="cover" />;
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: 'black' },
+  fill: { ...StyleSheet.absoluteFillObject, backgroundColor: 'black' },
 });

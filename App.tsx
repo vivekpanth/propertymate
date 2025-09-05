@@ -33,7 +33,6 @@ export default function App() {
           <Tab.Screen name="Profile">{() => <Screen title="Profile" />}</Tab.Screen>
           <Tab.Screen name="Manage">{() => <Screen title="Manage" />}</Tab.Screen>
           <Tab.Screen name="Review">{() => <Screen title="Review" />}</Tab.Screen>
-          <Tab.Screen name="SignIn">{() => <Screen title="SignIn" />}</Tab.Screen>
           <Tab.Screen name="SignIn">{() => <SignInScreen />}</Tab.Screen>
         </Tab.Navigator>
       </NavigationContainer>
