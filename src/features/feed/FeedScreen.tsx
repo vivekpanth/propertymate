@@ -3,6 +3,8 @@ import { View, Dimensions, FlatList, TouchableOpacity, Text, StyleSheet, ViewTok
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { VideoPlayer } from '../../components/video/VideoPlayer';
 import { Heart, Share2, MessageCircle, Volume2, VolumeX } from 'lucide-react-native';
+import { AreasGallery } from '../areas/AreasGallery';
+import { AreasChip } from '../../components/ui/AreasChip';
 
 const { height: screenHeight, width } = Dimensions.get('window');
 
@@ -19,6 +21,7 @@ export const FeedScreen: React.FC = () => {
   const videoHeight = screenHeight - insets.bottom - 140; // Account for tab bar (~60px)
   const [index, setIndex] = useState(0);
   const [muted, setMuted] = useState(true);
+  const [areasVisible, setAreasVisible] = useState(false);
   const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 80 }).current;
 
   const onViewableItemsChanged = useRef(({ viewableItems }: { viewableItems: ViewToken[] }) => {
@@ -52,6 +55,10 @@ export const FeedScreen: React.FC = () => {
           </View>
           <View style={styles.caption}> 
             <Text style={styles.captionText}>Mock Property • #{i + 1}</Text>
+            <AreasChip 
+              roomCount={5} 
+              onPress={() => setAreasVisible(true)} 
+            />
           </View>
         </View>
       </View>
@@ -63,20 +70,28 @@ export const FeedScreen: React.FC = () => {
   const data = useMemo(() => MOCK_VIDEOS, []);
 
   return (
-    <FlatList
-      data={data}
-      keyExtractor={keyExtractor}
-      renderItem={renderItem}
-      pagingEnabled
-      bounces={false}
-      showsVerticalScrollIndicator={false}
-      onViewableItemsChanged={onViewableItemsChanged}
-      viewabilityConfig={viewabilityConfig}
-      getItemLayout={getItemLayout}
-      initialNumToRender={2}
-      windowSize={3}
-      removeClippedSubviews
-    />
+    <>
+      <FlatList
+        data={data}
+        keyExtractor={keyExtractor}
+        renderItem={renderItem}
+        pagingEnabled
+        bounces={false}
+        showsVerticalScrollIndicator={false}
+        onViewableItemsChanged={onViewableItemsChanged}
+        viewabilityConfig={viewabilityConfig}
+        getItemLayout={getItemLayout}
+        initialNumToRender={2}
+        windowSize={3}
+        removeClippedSubviews
+      />
+      <AreasGallery
+        visible={areasVisible}
+        onClose={() => setAreasVisible(false)}
+        propertyTitle={`Mock Property • #${index + 1}`}
+        rooms={[]} // Uses default MOCK_ROOMS from AreasGallery
+      />
+    </>
   );
 };
 
