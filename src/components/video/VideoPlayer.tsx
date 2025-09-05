@@ -63,11 +63,16 @@ export const VideoPlayer: React.FC<Props> = ({ uri, muted = true, autoPlay = tru
       clearInterval(interval);
       loadSub.remove?.();
       endSub.remove?.();
-      player.pause();
+      try {
+        // Guard: on fast unmounts the native object may already be disposed
+        (player as unknown as { pause?: () => void }).pause?.();
+      } catch {
+        // no-op
+      }
     };
   }, [onEnd, onReady, player, addListener, getCurrentTime]);
 
-  return <VideoView style={styles.fill} player={player} allowsFullscreen allowsPictureInPicture />;
+  return <VideoView style={styles.fill} player={player} allowsFullscreen allowsPictureInPicture contentFit="cover" />;
 };
 
 const styles = StyleSheet.create({
