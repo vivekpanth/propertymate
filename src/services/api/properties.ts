@@ -75,4 +75,52 @@ export const propertiesApi = {
     if (error) throw error;
     return data.signedUrl;
   },
+
+  // Resolve a possibly-storage path to a playable URL
+  async toPlayableUrl(rawUrl: string): Promise<string> {
+    // Supported formats:
+    // 1) storage://bucket/path/to/file.mp4
+    // 2) bucket:path/to/file.mp4
+    // otherwise treat as full URL
+    if (!rawUrl) return rawUrl;
+    const storageProto = rawUrl.startsWith('storage://');
+    const colonIdx = rawUrl.indexOf(':');
+    if (storageProto) {
+      const withoutProto = rawUrl.replace('storage://', '');
+      const firstSlash = withoutProto.indexOf('/');
+      if (firstSlash > 0) {
+        const bucket = withoutProto.slice(0, firstSlash);
+        const path = withoutProto.slice(firstSlash + 1);
+        try {
+          return await this.getSignedUrl(bucket, path);
+        } catch {
+          return rawUrl;
+        }
+      }
+    } else if (colonIdx > 0 && !rawUrl.startsWith('http')) {
+      const bucket = rawUrl.slice(0, colonIdx);
+      const path = rawUrl.slice(colonIdx + 1);
+      try {
+        return await this.getSignedUrl(bucket, path);
+      } catch {
+        return rawUrl;
+      }
+    }
+    return rawUrl;
+  },
+
+  // Map hero media URLs to signed URLs when needed
+  async withSignedHeroUrls(properties: PropertyWithMedia[]): Promise<PropertyWithMedia[]> {
+    const resolved = await Promise.all(
+      (properties || []).map(async (p) => {
+        const hero = (p.media || []).find((m) => m.media_type === 'hero');
+        if (hero) {
+          const playable = await this.toPlayableUrl(hero.url);
+          hero.url = playable;
+        }
+        return p;
+      })
+    );
+    return resolved;
+  },
 };

@@ -25,7 +25,10 @@ export const usePublishedProperties = () => {
 export const useHeroVideos = () => {
   return useQuery({
     queryKey: queryKeys.heroVideos(),
-    queryFn: propertiesApi.getHeroVideos,
+    queryFn: async () => {
+      const data = await propertiesApi.getHeroVideos();
+      return propertiesApi.withSignedHeroUrls(data);
+    },
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });

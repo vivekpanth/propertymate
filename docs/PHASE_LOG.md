@@ -41,9 +41,10 @@ Lightweight running log so any new session can resume instantly.
 - Summary: Full-screen Areas modal, room chips, auto-scroll active chip.
 - Checks: lint/type/tests ✅
 
-## Phase 6 – Supabase Wiring (In Progress)
+## Phase 6 – Supabase Wiring (Complete)
 
-- Branch: phase-6-supabase-integration
-- Summary: React Query setup; API layer; feed uses real data with mock fallback.
-- TODO next: signed URLs for media; caching/prefetch.
-- Checks: lint/type/tests ✅ (with mock fallback)
+- Branch: phase-6-supabase-integration (merged)
+- Summary: React Query + API layer; feed uses Supabase with mock fallback.
+- Addendum (6b): Signed URLs for media; prefetch next hero (ranged GET) for faster first-frame; UI unchanged.
+- Decisions: support `storage://bucket/path` and `bucket:path` for Storage URLs.
+- Checks: lint/type/tests ✅
