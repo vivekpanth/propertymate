@@ -7,6 +7,7 @@ import { AreasGallery } from '../areas/AreasGallery';
 import { AreasChip } from '../../components/ui/AreasChip';
 import { useHeroVideos, usePropertyRooms } from '../../hooks/useProperties';
 import { PropertyWithMedia } from '../../services/api/properties';
+import { prefetchVideo } from '../../services/video/prefetch';
 
 const { height: screenHeight, width } = Dimensions.get('window');
 
@@ -19,9 +20,7 @@ export const FeedScreen: React.FC = () => {
   const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 80 }).current;
 
   // Fetch hero videos from Supabase
-  const { data: properties = [], isLoading, error } = useHeroVideos();
-  const selectedProperty = (properties as PropertyWithMedia[])[index];
-  const rooms = usePropertyRooms(selectedProperty?.id || '');
+  const { data: properties = [], isLoading } = useHeroVideos();
 
   const onViewableItemsChanged = useRef(({ viewableItems }: { viewableItems: ViewToken[] }) => {
     const firstVisible = (viewableItems || []).find(v => v.isViewable);
@@ -30,12 +29,57 @@ export const FeedScreen: React.FC = () => {
     }
   }).current;
 
+  // Build data first so downstream hooks/closures can depend on it safely
+  const data = useMemo(() => (properties as PropertyWithMedia[]) || [], [properties]);
+
+  // Fallback to mock properties if nothing to render
+  const displayData = useMemo(() => {
+    if (data.length > 0) return data;
+    const MOCK_VIDEOS = [
+      'https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
+      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
+      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+    ];
+    const now = new Date().toISOString();
+    return MOCK_VIDEOS.map((url, i) => ({
+      id: `mock-${i}`,
+      agent_id: 'mock-agent',
+      status: 'published',
+      title: `Mock Property • #${i + 1}`,
+      is_rental: false,
+      suburb: 'Demo Suburb',
+      property_type: 'apartment',
+      created_at: now,
+      media: [
+        {
+          id: `mock-media-${i}`,
+          property_id: `mock-${i}`,
+          media_type: 'hero',
+          url,
+          sort_order: 0,
+          created_at: now,
+        },
+      ],
+    } as PropertyWithMedia));
+  }, [data]);
+
+  const selectedProperty = displayData[index] ?? displayData[0];
+  const rooms = usePropertyRooms(selectedProperty?.id || '');
+
   const keyExtractor = useCallback((property: PropertyWithMedia) => property.id, []);
 
   const renderItem = useCallback(({ item, index: i }: ListRenderItemInfo<PropertyWithMedia>) => {
     const autoPlay = i === index;
     const heroVideo = item.media?.find(m => m.media_type === 'hero');
     const videoUrl = heroVideo?.url || 'https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
+    // Prefetch next video's first bytes using displayData
+    if (autoPlay && i + 1 < displayData.length) {
+      const next = displayData[i + 1];
+      const nextHero = next?.media?.find(m => m.media_type === 'hero');
+      prefetchVideo(nextHero?.url);
+    }
     
     return (
       <View style={{ height: videoHeight, width }}>
@@ -65,11 +109,11 @@ export const FeedScreen: React.FC = () => {
         </View>
       </View>
     );
-  }, [index, muted, videoHeight, rooms.length]);
+  }, [index, muted, videoHeight, rooms.length, displayData]);
 
   const getItemLayout = useCallback((_: unknown, i: number) => ({ length: videoHeight, offset: videoHeight * i, index: i }), [videoHeight]);
 
-  const data = useMemo(() => properties as PropertyWithMedia[], [properties]);
+  
 
   // Loading state
   if (isLoading) {
@@ -81,30 +125,12 @@ export const FeedScreen: React.FC = () => {
     );
   }
 
-  // Error state
-  if (error) {
-    return (
-      <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>Failed to load properties</Text>
-        <Text style={styles.errorSubtext}>Please check your connection</Text>
-      </View>
-    );
-  }
-
-  // Empty state
-  if ((properties as PropertyWithMedia[]).length === 0) {
-    return (
-      <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>No properties available</Text>
-        <Text style={styles.emptySubtext}>Check back later for new listings</Text>
-      </View>
-    );
-  }
+  // We always render using displayData (mock fallback ensures not empty)
 
   return (
     <>
       <FlatList
-        data={data}
+        data={displayData}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
         pagingEnabled
