@@ -4,14 +4,9 @@ import { VideoPlayer } from '../../components/video/VideoPlayer';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react-native';
 import { useTheme } from '../../theme/ThemeProvider';
 import { haptics } from '../../utils/haptics';
+import { Room } from '../../types/property';
 
 
-export interface Room {
-  id: string;
-  name: string;
-  videoUrl: string;
-  thumbnailUrl?: string;
-}
 
 interface AreasGalleryProps {
   visible: boolean;

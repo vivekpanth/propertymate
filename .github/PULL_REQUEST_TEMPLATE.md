@@ -1,23 +1,23 @@
-## ✅ Phase {N} Complete — {Name}
+## Summary
+Describe the phase and the goal of this PR.
 
-### 📋 Changes
--
+## Changes
+- 
 
-### 🧪 Tests
-- Lint/Type: passing
-- Unit: X passed
-- E2E: scaffold only
+## Tests & Checks
+- Lint: `npm run lint` →
+- Typecheck: `npm run typecheck` →
+- Tests: `npm test` →
+- App runs locally: ☐ iOS ☐ Android ☐ Web
 
-### 🚦 Status
-- App runs locally
+## Screenshots / Videos
+Attach key screenshots or short clips.
 
-### 🔗 GitHub
-- Branch: phase-{N}
-- CI: passing/links
+## Risks / Rollback
+- Potential impact:
+- Rollback plan:
 
-### Next Steps
--
-
-### Screenshots
+## Next Steps
+- 
 
 
