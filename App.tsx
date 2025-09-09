@@ -9,6 +9,7 @@ import { SearchScreen } from './src/features/search/SearchScreen';
 import { FeedScreen } from './src/features/feed/FeedScreen';
 import { SignInScreen } from './src/features/auth/SignInScreen';
 import { SavedScreen } from './src/features/saved/SavedScreen';
+import { CreatePropertyScreen } from './src/features/manage/CreatePropertyScreen';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -45,7 +46,7 @@ export default function App() {
             <Tab.Screen name="Saved">{() => <SavedScreen />}</Tab.Screen>
             <Tab.Screen name="Messaging">{() => <Screen title="Messaging" />}</Tab.Screen>
             <Tab.Screen name="Profile">{() => <Screen title="Profile" />}</Tab.Screen>
-            <Tab.Screen name="Manage">{() => <Screen title="Manage" />}</Tab.Screen>
+            <Tab.Screen name="Manage">{() => <CreatePropertyScreen />}</Tab.Screen>
             <Tab.Screen name="Review">{() => <Screen title="Review" />}</Tab.Screen>
             <Tab.Screen name="SignIn">{() => <SignInScreen />}</Tab.Screen>
           </Tab.Navigator>

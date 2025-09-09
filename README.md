@@ -38,13 +38,12 @@ npm test           # Jest tests
 
 ## 📱 Current Status
 
-**Phase 7 In Progress**: Search & Saved functionality with:
+**Phase 8 In Progress**: Agent Tools (Create Property – Draft) with:
 
-- **Search**: Debounced query with real-time filtering
-- **Filters**: Price range, bedrooms, bathrooms, property type
-- **Favorites**: Add/remove with optimistic UI updates
-- **Saved Screen**: Displays favorited properties with empty states
-- **Mock Data**: Working with local data, ready for Supabase integration
+- **Create Property**: Minimal form (title, suburb, type) → draft
+- **Validation**: zod schema on API inputs
+- **Manage Tab**: Wired to Create Property screen
+- **APIs**: create/update/submitForReview stubs in place
 
 ## 🗂 Project Structure
 
@@ -84,7 +83,8 @@ Work is organized by phases. Each phase ends with lint/type/tests passing and a 
 - ✅ **Phase 4**: Feed (Mock) - TikTok-style video feed
 - ✅ **Phase 5**: Areas Gallery (Mock) - Room-by-room video tours
 - ✅ **Phase 6**: Wire Feed/Areas to Supabase - Real data integration
-- 🔄 **Phase 7**: Search & Saved (Real) - Search API, filters, favorites
+- ✅ **Phase 7**: Search & Saved (Real) - Search API, filters, favorites
+- 🔄 **Phase 8**: Agent Tools - Create/Edit property, uploader, review
 - ⏳ **Phase 8**: Agent Tools
 - ⏳ **Phase 9**: Admin Review & Publish
 - ⏳ **Phase 10**: Messaging & Push
