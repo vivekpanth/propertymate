@@ -59,3 +59,14 @@ Lightweight running log so any new session can resume instantly.
   - Favorites: add/remove with RLS, optimistic UI updates, error rollback
   - Saved: displays favorited properties, empty state, loading states
 - Checks: lint/type/tests ✅
+
+## Phase 8 – Agent Tools (Draft → Review)
+
+- Status: in progress
+- Branch: phase-8-agent-tools
+- Summary: Scaffold Agent Tools: create property (draft), zod-validated API, wire Manage tab.
+- Features (this slice):
+  - API: `createProperty`, `updateProperty`, `submitForReview` with zod validation
+  - UI: `CreatePropertyScreen` minimal form (title, suburb, type)
+  - Navigation: Manage tab shows Create form
+- Checks: lint/type/tests ✅
