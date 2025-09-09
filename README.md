@@ -38,13 +38,13 @@ npm test           # Jest tests
 
 ## 📱 Current Status
 
-**Phase 4 Complete**: TikTok-style video feed with:
+**Phase 7 In Progress**: Search & Saved functionality with:
 
-- Full-screen video playback (covers screen except bottom tab)
-- Smooth vertical scrolling with paging
-- Auto-play based on visibility
-- Overlay controls (like, comment, share, mute)
-- Performance optimizations for 55-60 FPS scrolling
+- **Search**: Debounced query with real-time filtering
+- **Filters**: Price range, bedrooms, bathrooms, property type
+- **Favorites**: Add/remove with optimistic UI updates
+- **Saved Screen**: Displays favorited properties with empty states
+- **Mock Data**: Working with local data, ready for Supabase integration
 
 ## 🗂 Project Structure
 
@@ -56,7 +56,9 @@ src/
 ├── features/
 │   ├── auth/         # Sign-in screens
 │   ├── feed/         # TikTok-style video feed
-│   ├── search/       # Property search
+│   ├── areas/        # Room-by-room video gallery
+│   ├── search/       # Property search with filters
+│   ├── saved/        # Favorited properties
 │   └── ...
 ├── services/
 │   └── supabase.ts   # Database client
@@ -80,9 +82,9 @@ Work is organized by phases. Each phase ends with lint/type/tests passing and a 
 - ✅ **Phase 2**: Database Setup (Supabase)
 - ✅ **Phase 3**: Authentication & RBAC
 - ✅ **Phase 4**: Feed (Mock) - TikTok-style video feed
-- 🔄 **Phase 5**: Areas Gallery (Mock)
-- ⏳ **Phase 6**: Wire Feed/Areas to Supabase
-- ⏳ **Phase 7**: Search & Saved (Real)
+- ✅ **Phase 5**: Areas Gallery (Mock) - Room-by-room video tours
+- ✅ **Phase 6**: Wire Feed/Areas to Supabase - Real data integration
+- 🔄 **Phase 7**: Search & Saved (Real) - Search API, filters, favorites
 - ⏳ **Phase 8**: Agent Tools
 - ⏳ **Phase 9**: Admin Review & Publish
 - ⏳ **Phase 10**: Messaging & Push

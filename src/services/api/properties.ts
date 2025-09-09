@@ -5,6 +5,11 @@ export interface PropertyWithMedia extends Property {
   media: PropertyMedia[];
 }
 
+interface FavoriteWithProperty {
+  property_id: string;
+  properties: PropertyWithMedia;
+}
+
 export const propertiesApi = {
   // Get published properties for feed
   async getPublishedProperties(): Promise<PropertyWithMedia[]> {
@@ -19,6 +24,61 @@ export const propertiesApi = {
 
     if (error) throw error;
     return properties || [];
+  },
+
+  // Search properties with optional filters and pagination
+  async searchPublishedProperties(params: {
+    query?: string;
+    filters?: {
+      minPrice?: number;
+      maxPrice?: number;
+      bedrooms?: number;
+      bathrooms?: number;
+      isRental?: boolean;
+      suburb?: string;
+      propertyType?: Property['property_type'];
+    };
+    page?: number; // 1-based
+    pageSize?: number; // default 10
+  }): Promise<{ items: PropertyWithMedia[]; total: number; page: number; pageSize: number }> {
+    const { query, filters, page = 1, pageSize = 10 } = params || {};
+
+    let qb = supabase
+      .from('properties')
+      .select('*, media:property_media(*)', { count: 'exact' })
+      .eq('status', 'published');
+
+    if (query && query.trim().length > 0) {
+      // Search in title and suburb
+      // Use ilike for case-insensitive match
+      qb = qb.or(`title.ilike.%${query}%,suburb.ilike.%${query}%`);
+    }
+
+    if (filters) {
+      if (typeof filters.minPrice === 'number') qb = qb.gte('price', filters.minPrice);
+      if (typeof filters.maxPrice === 'number') qb = qb.lte('price', filters.maxPrice);
+      if (typeof filters.bedrooms === 'number') qb = qb.gte('bedrooms', filters.bedrooms);
+      if (typeof filters.bathrooms === 'number') qb = qb.gte('bathrooms', filters.bathrooms);
+      if (typeof filters.isRental === 'boolean') qb = qb.eq('is_rental', filters.isRental);
+      if (filters.suburb && filters.suburb.trim()) qb = qb.ilike('suburb', `%${filters.suburb}%`);
+      if (filters.propertyType) qb = qb.eq('property_type', filters.propertyType);
+    }
+
+    qb = qb.order('published_at', { ascending: false });
+
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+    qb = qb.range(from, to);
+
+    const { data, error, count } = await qb;
+    if (error) throw error;
+
+    return {
+      items: (data as PropertyWithMedia[]) || [],
+      total: count || 0,
+      page,
+      pageSize,
+    };
   },
 
   // Get property by ID with all media
@@ -122,5 +182,52 @@ export const propertiesApi = {
       })
     );
     return resolved;
+  },
+
+  // Favorites API
+  async addToFavorites(propertyId: string): Promise<void> {
+    const { error } = await supabase
+      .from('favorites')
+      .insert({ property_id: propertyId });
+    
+    if (error) throw error;
+  },
+
+  async removeFromFavorites(propertyId: string): Promise<void> {
+    const { error } = await supabase
+      .from('favorites')
+      .delete()
+      .eq('property_id', propertyId);
+    
+    if (error) throw error;
+  },
+
+  async getFavorites(): Promise<PropertyWithMedia[]> {
+    const { data: favorites, error } = await supabase
+      .from('favorites')
+      .select(`
+        property_id,
+        properties!inner(
+          *,
+          media:property_media(*)
+        )
+      `)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    
+    // Extract properties from the joined data
+    return (favorites || []).map((fav) => (fav as unknown as FavoriteWithProperty).properties);
+  },
+
+  async isFavorited(propertyId: string): Promise<boolean> {
+    const { data, error } = await supabase
+      .from('favorites')
+      .select('property_id')
+      .eq('property_id', propertyId)
+      .single();
+
+    if (error && error.code !== 'PGRST116') throw error; // PGRST116 = no rows returned
+    return !!data;
   },
 };
