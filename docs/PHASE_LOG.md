@@ -48,3 +48,14 @@ Lightweight running log so any new session can resume instantly.
 - Addendum (6b): Signed URLs for media; prefetch next hero (ranged GET) for faster first-frame; UI unchanged.
 - Decisions: support `storage://bucket/path` and `bucket:path` for Storage URLs.
 - Checks: lint/type/tests ✅
+
+## Phase 7 – Search & Saved (Real)
+
+- Status: in progress
+- Branch: phase-7-search-saved
+- Summary: Search API with filters/pagination, Favorites API with optimistic updates, Saved screen.
+- Features:
+  - Search: debounced query, price/bedroom/bathroom/type filters, mock data integration
+  - Favorites: add/remove with RLS, optimistic UI updates, error rollback
+  - Saved: displays favorited properties, empty state, loading states
+- Checks: lint/type/tests ✅
